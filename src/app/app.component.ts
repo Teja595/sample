@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { NgForm } from '@angular/forms';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,7 +16,30 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.getData();
   }
-  
+  user = {
+    name: '',
+    username: '',
+    email: '',
+    street: '',
+    suite: '',
+    city: '',
+    zipcode: '',
+    geoLat: null,
+    geoLng: null,
+    phone: '',
+    website: '',
+    companyName: '',
+    companyCatchPhrase: '',
+    companyBs: ''
+  };
+
+  onSubmit(form: NgForm) {
+    this.http.post('http://localhost:8080/users', form.value)
+      .subscribe({
+        next: (response) => console.log('Success!', response),
+        error: (error) => console.error('Error!', error)
+      });
+  }
   getData(): void {
     this.loading = true;
     const url = 'https://jsonplaceholder.typicode.com/users'; // Replace with your target URL
