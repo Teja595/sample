@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   constructor(private http:HttpClient) {}
 
   ngOnInit() {
-    this.getData();
+    // this.getData();
   }
   user = {
     name: '',
@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
   };
 
   onSubmit(form: NgForm) {
-    this.http.post('http://localhost:8080/users', form.value)
+    this.http.post('http://learn2code.redgrape.tech:8080/users', form.value)
       .subscribe({
         next: (response) => console.log('Success!', response),
         error: (error) => console.error('Error!', error)
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
   }
   getData(): void {
     this.loading = true;
-    const url = 'https://jsonplaceholder.typicode.com/users'; // Replace with your target URL
+    const url = 'http://learn2code.redgrape.tech:8080/users'; // Replace with your target URL
     this.http.get(url)
       .subscribe({
         next: (response) => {

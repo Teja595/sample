@@ -1,65 +1,66 @@
 
-  <h1 >Enter Details</h1>
+<h1 >Enter Details</h1>
+<button (click)="getData()">Show All</button>
 
 
 <form #userForm="ngForm" (ngSubmit)="onSubmit(userForm)">
-  <div>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" [(ngModel)]="user.name" required>
-  </div>
-  <div>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" [(ngModel)]="user.username" required>
-  </div>
-  <div>
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" [(ngModel)]="user.email" required>
-  </div>
-  <div>
-    <label for="street">Street:</label>
-    <input type="text" id="street" name="street" [(ngModel)]="user.street">
-  </div>
-  <div>
-    <label for="suite">Suite:</label>
-    <input type="text" id="suite" name="suite" [(ngModel)]="user.suite">
-  </div>
-  <div>
-    <label for="city">City:</label>
-    <input type="text" id="city" name="city" [(ngModel)]="user.city" required>
-  </div>
-  <div>
-    <label for="zipcode">Zipcode:</label>
-    <input type="text" id="zipcode" name="zipcode" [(ngModel)]="user.zipcode">
-  </div>
-  <div>
-    <label for="geoLat">Geo Lat:</label>
-    <input type="number" id="geoLat" name="geoLat" [(ngModel)]="user.geoLat" step="any">
-  </div>
-  <div>
-    <label for="geoLng">Geo Lng:</label>
-    <input type="number" id="geoLng" name="geoLng" [(ngModel)]="user.geoLng" step="any">
-  </div>
-  <div>
-    <label for="phone">Phone:</label>
-    <input type="tel" id="phone" name="phone" [(ngModel)]="user.phone">
-  </div>
-  <div>
-    <label for="website">Website:</label>
-    <input type="url" id="website" name="website" [(ngModel)]="user.website">
-  </div>
-  <div>
-    <label for="companyName">Company Name:</label>
-    <input type="text" id="companyName" name="companyName" [(ngModel)]="user.companyName">
-  </div>
-  <div>
-    <label for="companyCatchPhrase">Company CatchPhrase:</label>
-    <input type="text" id="companyCatchPhrase" name="companyCatchPhrase" [(ngModel)]="user.companyCatchPhrase">
-  </div>
-  <div>
-    <label for="companyBs">Company BS:</label>
-    <input type="text" id="companyBs" name="companyBs" [(ngModel)]="user.companyBs">
-  </div>
-  <button type="submit" [disabled]="!userForm.valid">Submit</button>
+<div>
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" [(ngModel)]="user.name" required>
+</div>
+<div>
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" [(ngModel)]="user.username" required>
+</div>
+<div>
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" [(ngModel)]="user.email" required>
+</div>
+<div>
+  <label for="street">Street:</label>
+  <input type="text" id="street" name="street" [(ngModel)]="user.street">
+</div>
+<div>
+  <label for="suite">Suite:</label>
+  <input type="text" id="suite" name="suite" [(ngModel)]="user.suite">
+</div>
+<div>
+  <label for="city">City:</label>
+  <input type="text" id="city" name="city" [(ngModel)]="user.city" required>
+</div>
+<div>
+  <label for="zipcode">Zipcode:</label>
+  <input type="text" id="zipcode" name="zipcode" [(ngModel)]="user.zipcode">
+</div>
+<div>
+  <label for="geoLat">Geo Lat:</label>
+  <input type="number" id="geoLat" name="geoLat" [(ngModel)]="user.geoLat" step="any">
+</div>
+<div>
+  <label for="geoLng">Geo Lng:</label>
+  <input type="number" id="geoLng" name="geoLng" [(ngModel)]="user.geoLng" step="any">
+</div>
+<div>
+  <label for="phone">Phone:</label>
+  <input type="tel" id="phone" name="phone" [(ngModel)]="user.phone">
+</div>
+<div>
+  <label for="website">Website:</label>
+  <input type="url" id="website" name="website" [(ngModel)]="user.website">
+</div>
+<div>
+  <label for="companyName">Company Name:</label>
+  <input type="text" id="companyName" name="companyName" [(ngModel)]="user.companyName">
+</div>
+<div>
+  <label for="companyCatchPhrase">Company CatchPhrase:</label>
+  <input type="text" id="companyCatchPhrase" name="companyCatchPhrase" [(ngModel)]="user.companyCatchPhrase">
+</div>
+<div>
+  <label for="companyBs">Company BS:</label>
+  <input type="text" id="companyBs" name="companyBs" [(ngModel)]="user.companyBs">
+</div>
+<button type="submit" [disabled]="!userForm.valid">Submit</button>
 </form>
 
 
@@ -67,18 +68,23 @@
 
 
 <div *ngIf="loading">
-  <p>Loading users...</p>
+<p>Loading users...</p>
 </div>
 
 <div *ngIf="!loading">
-  <h2>Users</h2>
-  <div *ngFor="let user of data" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-    <h3>{{ user.name }} (@{{ user.username }})</h3>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Address:</strong> {{ user.address.street }}, {{ user.address.suite }},
-      {{ user.address.city }}, {{ user.address.zipcode }}</p>
-    <p><strong>Phone:</strong> {{ user.phone }}</p>
-    <p><strong>Website:</strong> <a href="http://{{ user.website }}" target="_blank">{{ user.website }}</a></p>
-    <p><strong>Company:</strong> {{ user.company.name }}</p>
-  </div>
+<h2>Users</h2>
+<div *ngFor="let user of data" style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+  <h3>{{ user.name }} (@{{ user.username }})</h3>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Address:</strong> {{ user.street }}, {{ user.suite }},
+    {{ user.city }}, {{ user.zipcode }}</p>
+  <!-- Displaying geoLat and geoLng -->
+  <p><strong>Location:</strong> Latitude: {{ user.geoLat }}, Longitude: {{ user.geoLng }}</p>
+  <p><strong>Phone:</strong> {{ user.phone }}</p>
+  <!-- Updated to dynamically bind the website URL -->
+  <p><strong>Website:</strong> <a href="{{ user.website }}" target="_blank">{{ user.website }}</a></p>
+  <p><strong>Company Name:</strong> {{ user.companyName }}</p>
+  <p><strong>Company CatchPhrase:</strong> {{ user.companyCatchPhrase }}</p>
+  <p><strong>Company BS:</strong> {{ user.companyBs }}</p>
+</div>
 </div>
