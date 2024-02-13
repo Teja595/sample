@@ -14,12 +14,12 @@ import java.util.List;
     // In UserServiceImpl class
 
     @Override
-    public User save(User user) {
+    public User_s save(User_s user) {
       return userRepository.save(user);
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User_s> findAll() {
       return userRepository.findAll();
     }
   }

@@ -16,12 +16,12 @@ import java.util.List;
       this.userService = userService;
     }
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-      User savedUser = userService.save(user);
+    public ResponseEntity<User_s> createUser(@RequestBody User_s user) {
+      User_s savedUser = userService.save(user);
       return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<User_s> getAllUsers() {
       return userService.findAll();
     }
   }

@@ -3,9 +3,9 @@ import java.util.List;
 public interface UserService {
 
 
-    List<User> findAll();
+    List<User_s> findAll();
     // Other service methods
-    User save(User user);
+    User_s save(User_s user);
   }
 
 
