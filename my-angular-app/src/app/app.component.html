@@ -1,0 +1,35 @@
+<!-- app.component.html -->
+<h2>{{ title }}</h2>
+<div class="table-container">
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Device ID</th>
+        <th>Epoch Data</th>
+        <th>Epoch Stored</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Active</th> <!-- New Column Header -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.id }}</td>
+        <td>{{ user.deviceId }}</td>
+        <td>{{ user.epochData }}</td>
+        <td>{{ user.epochStored }}</td>
+        <td>{{ user.latitude }}</td>
+        <td>{{ user.longitude }}</td>
+        <td>{{ user.isActive }}</td> <!-- New Column Data -->
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="button-container">
+  <button (click)="onPrevClick()" [disabled]="currentPage <= 1">Previous</button>
+  <button (click)="onNextClick()" [disabled]="currentPage >= totalPages">Next</button>
+</div>
+
+<!-- Message display goes here -->
+<div *ngIf="message" class="message">{{ message }}</div>

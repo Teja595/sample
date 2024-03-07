@@ -1,0 +1,101 @@
+/* General styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  /* app.component.css */
+h2 {
+    text-align: center; /* Center-align the title */
+    color: #007bff; /* A shade of blue that matches the button colors for consistency */
+    margin-bottom: 30px; /* Adds some space between the title and the content below */
+    font-family: 'Arial', sans-serif; /* Use a specific font family, adjust as needed */
+    font-weight: normal; /* Adjust the font weight, normal or bold depending on preference */
+  }
+  
+  .table-container, .button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Adds spacing below the container */
+  }
+  .button-container {
+    /* If you want the buttons to be closer together and centered as a group */
+    gap: 10px; /* Adjust the space between buttons */
+  }
+  
+  table {
+    max-width: 960px; /* Adjust this value based on your preference */
+    width: 100%; /* Make the table width responsive up to the max-width */
+    margin: 0 auto; /* Center the table */
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Optional: Adds a subtle shadow around the table */
+  }
+  
+  thead {
+    background-color: #007bff;
+    color: #ffffff;
+  }
+  
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  /* Hover effect for rows */
+  tr:hover {
+    /* background-color: #dddfe2; */
+  }
+  
+  /* Message styling */
+  .message {
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    text-align: center;
+  }
+  
+  button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  button[disabled] {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  button:not([disabled]):hover {
+    background-color: #218838;
+  }
+  
+  button:not(:last-child) {
+    margin-right: 10px;
+  }
+  
+  /* Responsive design adjustments */
+  @media (max-width: 600px) {
+    th, td {
+      padding: 10px 5px;
+    }
+  
+    button {
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+  
