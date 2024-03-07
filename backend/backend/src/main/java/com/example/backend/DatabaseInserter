@@ -1,0 +1,92 @@
+package com.example.backend;
+
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class DatabaseInserter {
+    private static final String SSH_HOST = "learn2code.redgrape.tech";
+    private static final int SSH_PORT = 22; // Default SSH port
+    private static final String SSH_USER = "mvenkata";
+    private static final String SSH_PASSWORD = "IU4YkDD0kdLq";
+
+    private static final String REMOTE_HOST = "192.168.1.15"; // Assuming the database is on the same host as the SSH server
+    private static final int LOCAL_PORT = 5433; // Local port to forward the DB connection
+    private static final int REMOTE_PORT = 5432; // Default PostgreSQL port
+    private static final String DB_URL = "jdbc:postgresql://localhost:" + LOCAL_PORT + "/db_teja";
+//    private static final String DB_URL = "jdbc:postgresql://192.168.1.15:5433/db_teja";
+    private static final String DB_USER = "user_teja";
+    private static final String DB_PASSWORD = "VNgLRyn2jezQGBWaxH7Kuh";
+
+    public static void insertData(String jsonResponse) {
+        Session session = null;
+        try {
+            session = setupSSHTunnel(SSH_HOST, SSH_PORT, SSH_USER, SSH_PASSWORD, REMOTE_HOST, LOCAL_PORT, REMOTE_PORT);
+            System.out.println(session);
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            if (jsonObject.has("records")) {
+                JSONArray records = jsonObject.getJSONArray("records");
+                insertRecordsIntoDatabase(records);
+            } else {
+                System.out.println("No 'records' key found in JSON response.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error during data insertion: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
+    private static Session setupSSHTunnel(String sshHost, int sshPort, String sshUser, String sshPassword,
+                                          String remoteHost, int localPort, int remotePort) throws Exception {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(sshUser, sshHost, sshPort);
+        session.setPassword(sshPassword);
+
+        java.util.Properties config = new java.util.Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+
+        session.connect();
+        session.setPortForwardingL(localPort, remoteHost, remotePort);
+        System.out.println("SSH Tunnel established");
+        return session;
+    }
+
+
+    private static void insertRecordsIntoDatabase(JSONArray records) throws SQLException {
+        // Establish a database connection
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "INSERT INTO geolocation (deviceid, epoch_data, epoch_stored, latitude, longitude) VALUES (?, ?, ?, ?, ?)";
+
+            // Prepare the SQL statement
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (int i = 0; i < records.length(); i++) {
+                    JSONObject record = records.getJSONObject(i);
+
+                    pstmt.setString(1, record.getString("deviceid"));
+                    pstmt.setLong(2, record.getLong("epoch_data"));
+                    pstmt.setLong(3, record.getLong("epoch_stored"));
+                    pstmt.setString(4, record.getString("latitude"));
+                    pstmt.setString(5, record.getString("longitude"));
+
+                    // Execute the insert statement
+                    pstmt.executeUpdate();
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

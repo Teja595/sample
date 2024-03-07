@@ -13,10 +13,10 @@ import java.util.List;
     }
     // In UserServiceImpl class
 
-    @Override
-    public User_s save(User_s user) {
-      return userRepository.save(user);
-    }
+    // @Override
+    // public User_s save(User_s user) {
+    //   return userRepository.save(user);
+    // }
 
     @Override
     public List<User_s> findAll() {

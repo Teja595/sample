@@ -16,14 +16,14 @@ import java.util.List;
     public UserController(UserService userService) {
       this.userService = userService;
     }
-    @PostMapping
-    public ResponseEntity<User_s> createUser(@RequestBody User_s user) {
-      User_s savedUser = userService.save(user);
-      return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-    }
+    // @PostMapping
+    // public ResponseEntity<User_s> createUser(@RequestBody User_s user) {
+    //   User_s savedUser = userService.save(user);
+    //   return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    // }
     @GetMapping
-    public List<User_s> getAllUsers() {
-      return userService.findAll();
+    public List<User_s> getAllGeolocations() {
+        return userService.findAll();
     }
   }
 
