@@ -19,6 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.backend.DatabaseInserter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+
 // /home/mvenkata/get_users_data/backend/backend/src/main/java/com/example/backend/DatabaseInserter
 @SpringBootApplication
 public class BackendApplication {
@@ -46,15 +50,20 @@ public class BackendApplication {
 				System.out.println("Fetching data for page: " + page);
 				String data = fetchGeoLocationData(page, rowsPerPage);
 			databaseInserter.insertData(data);
+			// databaseInserter.runAtStartup();
 //				geoLocationService.insertData(data);
 				System.out.println(data); // Display the fetched data
-
-				System.out.println("Fetch next page? (yes/no): ");
-				String userInput = scanner.nextLine();
+				System.out.println("More? yes/no");
+				BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+				// Usage example
+				String userInput = reader.readLine();
+				
+				
 
 				if (!"yes".equalsIgnoreCase(userInput)) {
 					continueFetching = false;
 				} else {
+					
 					page++; // Increment to fetch the next page
 				}
 			}

@@ -1,7 +1,8 @@
 package com.example.backend;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
   @Service
   public class UserServiceImpl implements UserService {
@@ -19,8 +20,8 @@ import java.util.List;
     // }
 
     @Override
-    public List<User_s> findAll() {
-      return userRepository.findAll();
+    public Page<User_s> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
   }
 
