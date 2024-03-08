@@ -23,28 +23,47 @@ public class DatabaseInserter {
 
  @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private ObjectMapper objectMapper; // Jackson's ObjectMapper, automatically configured by Spring Boot
     @Autowired
             private JdbcTemplate jdbcTemplate;
-     public void insertData(String data) throws JsonProcessingException {
-            JsonNode root = objectMapper.readTree(data);
-            JsonNode records = root.path("records"); // Assuming the data structure
-    
-            if (records.isArray()) {
-                for (JsonNode record : records) {
-                    User_s location = new User_s();
-                    location.setDeviceId(record.get("deviceid").asText());
-                    location.setEpochData(record.get("epoch_data").asLong());
-                    location.setEpochStored(record.get("epoch_stored").asLong());
-                    location.setLatitude(record.get("latitude").asDouble());
-                    location.setLongitude(record.get("longitude").asDouble());
-                   
-                    userRepository.save(location);
+            private User_s lastLocation = null; // Field to store the last location processed
+
+            public void insertData(String data) throws JsonProcessingException {
+                JsonNode root = objectMapper.readTree(data);
+                JsonNode records = root.path("records"); // Assuming the data structure
+        
+                if (records.isArray()) {
+                    for (JsonNode record : records) {
+                        User_s location = new User_s();
+                        location.setDeviceId(record.get("deviceid").asText());
+                        location.setEpochData(record.get("epoch_data").asLong());
+                        location.setEpochStored(record.get("epoch_stored").asLong());
+                        location.setLatitude(record.get("latitude").asDouble());
+                        location.setLongitude(record.get("longitude").asDouble());
+        
+                    //     if (lastLocation != null) {
+                    //         // Calculate the delta distance between lastLocation and this new location
+                    //         double deltaDistance = userServiceImpl.haversineDistance(
+                    //                 lastLocation.getLatitude(), lastLocation.getLongitude(),
+                    //                 location.getLatitude(), location.getLongitude());
+                    //         location.setDelta_distance(deltaDistance);// Assuming you have setDeltaDistance method
+                    //          // Calculate the delta time
+                    // double deltaTime = (location.getEpochData() - lastLocation.getEpochData()) / 1000.0; // Assuming seconds
+                    // location.setDelta_t(deltaTime);
+                    //     }
+        
+                        userRepository.save(location); // Save the location with the delta distance
+        
+                        // lastLocation = location; // Update lastLocation with the current location
+                    }
                 }
-            }
-        }
+                userServiceImpl.updateDeltaDistances();
+            }     
+        
          // Autowire JdbcTemplate
         
             // Existing insertData method

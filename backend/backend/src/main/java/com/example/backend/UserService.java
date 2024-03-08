@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 public interface UserService {
 
   Page<User_s> findAll(Pageable pageable);
+  void updateDeltaDistances();
+  // List<User_s> findAllByOrderByEpochDataAsc();
 
   }
 

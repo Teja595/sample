@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 
 
 @Entity
-@Table(name = "Geo")
+@Table(name = "sample")
 public class User_s {
 
   @Id
@@ -22,13 +22,41 @@ private Long epochData;
 private Long epochStored;
 private Double latitude;
 private Double longitude;
+// Example new fields
+private Double delta_distance; 
+private Double delta_t;
+private Double speed;
+private Double mov_avg_spd;
 public User_s(){
 
 }
 
+  public Double getMov_avg_spd() {
+    return this.mov_avg_spd;
+  }
+
+  public void setMov_avg_spd(Double mov_avg_spd) {
+    this.mov_avg_spd = mov_avg_spd;
+  }
+
   public Long getId() {
     return this.id;
   }
+
+ 
+
+  public Double getDelta_distance() {
+    return this.delta_distance;
+  }
+
+  public void setDelta_distance(Double delta_distance) {
+    this.delta_distance = delta_distance;
+  }
+
+  public Double getDelta_t() {
+    return this.delta_t;
+  }
+
 
   @Override
   public String toString() {
@@ -39,7 +67,24 @@ public User_s(){
       ", epochStored='" + getEpochStored() + "'" +
       ", latitude='" + getLatitude() + "'" +
       ", longitude='" + getLongitude() + "'" +
+      ", delta_distance='" + getDelta_distance() + "'" +
+      ", delta_t='" + getDelta_t() + "'" +
+      ", speed='" + getSpeed() + "'" +
+      ", mov_avg_spd='" + getMov_avg_spd() + "'" +
       "}";
+  }
+ 
+
+  public void setDelta_t(Double delta_t) {
+    this.delta_t = delta_t;
+  }
+
+  public Double getSpeed() {
+    return this.speed;
+  }
+
+  public void setSpeed(Double speed) {
+    this.speed = speed;
   }
 
   public void setId(Long id) {
