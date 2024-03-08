@@ -10,6 +10,11 @@
         <th>Epoch Stored</th>
         <th>Latitude</th>
         <th>Longitude</th>
+        <th>delta distance</th>
+        <th>delta_t</th>
+        <th>speed</th>
+        <th>mov_avg_spd</th>
+
         <th>Active</th> <!-- New Column Header -->
       </tr>
     </thead>
@@ -21,13 +26,19 @@
         <td>{{ user.epochStored }}</td>
         <td>{{ user.latitude }}</td>
         <td>{{ user.longitude }}</td>
-        <td>{{ user.isActive }}</td> <!-- New Column Data -->
+        <td>{{ user.delta_distance }}</td>
+        <td>{{ user.delta_t }}</td>
+        
+        <td>{{ user.speed }}</td>
+        <td>{{ user.mov_avg_spd }}</td>
+
+        <td [ngClass]="user.isActive ? 'active' : 'inactive'">{{ user.isActive ? 'True' : 'False' }}</td>
       </tr>
     </tbody>
   </table>
 </div>
 <div class="button-container">
-  <button (click)="onPrevClick()" [disabled]="currentPage <= 1">Previous</button>
+  <button (click)="onPrevClick()" [disabled]="currentPage <= 0">Previous</button>
   <button (click)="onNextClick()" [disabled]="currentPage >= totalPages">Next</button>
 </div>
 

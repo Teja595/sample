@@ -12,7 +12,7 @@ export class AppComponent implements OnInit{
   title = 'Device ID data';
   
   users: User[] = []; // Initialize users array to empty
-  currentPage: number = 1;
+  currentPage: number = 0;
   rowsPerPage: number = 10;
   totalPages: number = 0;
   message: string = '';
@@ -58,7 +58,7 @@ export class AppComponent implements OnInit{
   }
 }
 onPrevClick(): void {
-  if (this.currentPage > 1) { // Ensure we don't go below the first page
+  if (this.currentPage >= 0) { // Ensure we don't go below the first page
     this.currentPage--;
     this.fetchData(this.currentPage, this.rowsPerPage);
   }

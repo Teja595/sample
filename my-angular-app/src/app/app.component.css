@@ -1,101 +1,113 @@
-/* General styling */
+/* General Body Styling */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-    background-color: #f5f5f5;
-  }
-  
-  /* app.component.css */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  background-color: #f5f5f5;
+  color: #333; /* Default text color for better readability */
+}
+
+/* Centered Table Title */
 h2 {
-    text-align: center; /* Center-align the title */
-    color: #007bff; /* A shade of blue that matches the button colors for consistency */
-    margin-bottom: 30px; /* Adds some space between the title and the content below */
-    font-family: 'Arial', sans-serif; /* Use a specific font family, adjust as needed */
-    font-weight: normal; /* Adjust the font weight, normal or bold depending on preference */
+  text-align: center;
+  color: #333;
+  margin: 0 auto 20px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Container for the Table */
+.table-container {
+  overflow-x: auto; /* Keeps the horizontal scroll for smaller screens */
+  margin: 20px auto; /* Centers the table-container */
+  max-width: 60%; /* Adjust this value according to your preference */
+  padding: 0 20px; /* Adds padding on the sides for spacing */
+}
+
+/* Stylish Table Design */
+table {
+  border-collapse: collapse;
+  margin: 20px 0;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow for depth */
+  background: linear-gradient(to top left, #ffffff, #f0f0f0); /* Updated gradient for a modern look */
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Table Headers */
+thead {
+  background: linear-gradient(to right, #0088ff, #0056b3); /* More vibrant gradient */
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Table Rows and Cells */
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea; /* Lighter border for a refined look */
+}
+
+tr:nth-child(even) {
+  background-color: #f8f8f8; /* Slightly lighter for subtle contrast */
+}
+
+tr:hover {
+  background-color: #e0e0e0; /* Smoother transition on hover */
+}
+
+/* State Indicators */
+.active, .inactive {
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  display: inline-block; /* Ensures proper alignment */
+}
+
+.active {
+  background-color: #4caf50;
+}
+
+.inactive {
+  background-color: #f44336;
+}
+
+/* Button Styling */
+.button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) {
+  .table-container {
+    max-width: 95%;
+    padding: 0 10px;
   }
-  
-  .table-container, .button-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px; /* Adds spacing below the container */
-  }
-  .button-container {
-    /* If you want the buttons to be closer together and centered as a group */
-    gap: 10px; /* Adjust the space between buttons */
-  }
-  
-  table {
-    max-width: 960px; /* Adjust this value based on your preference */
-    width: 100%; /* Make the table width responsive up to the max-width */
-    margin: 0 auto; /* Center the table */
-    border-collapse: collapse;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Optional: Adds a subtle shadow around the table */
-  }
-  
-  thead {
-    background-color: #007bff;
-    color: #ffffff;
-  }
-  
+
   th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    padding: 8px; /* Slightly reduced padding for space efficiency */
   }
-  
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  /* Hover effect for rows */
-  tr:hover {
-    /* background-color: #dddfe2; */
-  }
-  
-  /* Message styling */
-  .message {
-    padding: 10px;
-    margin-top: 20px;
-    border-radius: 5px;
-    color: #31708f;
-    background-color: #d9edf7;
-    border-color: #bce8f1;
-    text-align: center;
-  }
-  
-  button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-  
-  button[disabled] {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
-  
-  button:not([disabled]):hover {
-    background-color: #218838;
-  }
-  
-  button:not(:last-child) {
-    margin-right: 10px;
-  }
-  
-  /* Responsive design adjustments */
-  @media (max-width: 600px) {
-    th, td {
-      padding: 10px 5px;
-    }
-  
-    button {
-      padding: 10px;
-      font-size: 14px;
-    }
-  }
-  
+}
