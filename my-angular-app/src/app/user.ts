@@ -10,6 +10,8 @@ export interface User {
     delta_t : number;
     speed: number;
     mov_avg_spd: number;
+    humanReadableDate : string;
+    db_t:number;
     isActive?: boolean; 
 
   }
