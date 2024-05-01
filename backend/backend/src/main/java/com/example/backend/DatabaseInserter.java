@@ -1,8 +1,12 @@
 package com.example.backend;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.*;
 import java.util.Map;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+
+import jakarta.transaction.Transactional;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,45 +29,66 @@ public class DatabaseInserter {
     private UserRepository userRepository;
     @Autowired
     private UserServiceImpl userServiceImpl;
+//     @Autowired
+// private DeviceRecordRepository deviceRecordRepository;
+
+// public void insertRecordsData(List<DeviceRecord> records) {
+//     deviceRecordRepository.saveAll(records);
+// }
 
     @Autowired
     private ObjectMapper objectMapper; // Jackson's ObjectMapper, automatically configured by Spring Boot
     @Autowired
             private JdbcTemplate jdbcTemplate;
+            @Transactional
+    public void clearDatabase() {
+        userRepository.deleteAllInBatch(); // This method assumes you're using Spring Data JPA repository
+    }
             private User_s lastLocation = null; // Field to store the last location processed
 
-            public void insertData(String data) throws JsonProcessingException {
-                JsonNode root = objectMapper.readTree(data);
-                JsonNode records = root.path("records"); // Assuming the data structure
-        
-                if (records.isArray()) {
-                    for (JsonNode record : records) {
-                        User_s location = new User_s();
-                        location.setDeviceId(record.get("deviceid").asText());
-                        location.setEpochData(record.get("epoch_data").asLong());
-                        location.setEpochStored(record.get("epoch_stored").asLong());
-                        location.setLatitude(record.get("latitude").asDouble());
-                        location.setLongitude(record.get("longitude").asDouble());
-        
-                    //     if (lastLocation != null) {
-                    //         // Calculate the delta distance between lastLocation and this new location
-                    //         double deltaDistance = userServiceImpl.haversineDistance(
-                    //                 lastLocation.getLatitude(), lastLocation.getLongitude(),
-                    //                 location.getLatitude(), location.getLongitude());
-                    //         location.setDelta_distance(deltaDistance);// Assuming you have setDeltaDistance method
-                    //          // Calculate the delta time
-                    // double deltaTime = (location.getEpochData() - lastLocation.getEpochData()) / 1000.0; // Assuming seconds
-                    // location.setDelta_t(deltaTime);
-                    //     }
-        
-                        userRepository.save(location); // Save the location with the delta distance
-        
-                        // lastLocation = location; // Update lastLocation with the current location
+            public void insertData(List<String> allData) throws JsonProcessingException {
+                List<User_s> allUsers = new ArrayList<>();
+                Set<Long> uniqueEpochData = new HashSet<>();
+            
+                // Iterate over each JSON string representing a page of data
+                for (String dataPage : allData) {
+                    JsonNode root = objectMapper.readTree(dataPage);
+                    JsonNode records = root.path("records");
+            
+                    if (records.isArray()) {
+                        for (JsonNode record : records) {
+                            long epochData = record.get("epoch_data").asLong();
+                            // Check if epochData is unique
+                            if (uniqueEpochData.add(epochData)) {
+                                // Only parse and add the user if the epochData is unique
+                                User_s user = parseUser(record);
+                                allUsers.add(user);
+                            }
+                        }
                     }
                 }
-                userServiceImpl.updateDeltaDistances();
-            }     
+            
+                // Process the entire list of User_s objects at once
+                userServiceImpl.processAndStoreData(allUsers);
+            }
+            
+
         
+            // Helper method to parse a JsonNode to a User_s object, assuming you have setters for all fields in User_s
+    private User_s parseUser(JsonNode record) {
+        User_s user = new User_s();
+        user.setDeviceId(record.get("deviceid").asText());
+        user.setEpochData(record.get("epoch_data").asLong());
+        user.setEpochStored(record.get("epoch_stored").asLong());
+        user.setLatitude(record.get("latitude").asDouble());
+        user.setLongitude(record.get("longitude").asDouble());
+        // Include parsing for other fields as necessary
+        return user;
+    }
+
+    
+
+
          // Autowire JdbcTemplate
         
             // Existing insertData method
@@ -89,4 +114,5 @@ public class DatabaseInserter {
                 }
 
 
-}
+
+            }

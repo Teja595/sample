@@ -7,16 +7,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
 import jakarta.persistence.Table;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 
 @Entity
-@Table(name = "sample")
+@Table(name = "ts")
 public class User_s {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
+// @Column(name = "device_id")
 private String deviceId;
 private Long epochData;
 private Long epochStored;
@@ -25,8 +29,27 @@ private Double longitude;
 // Example new fields
 private Double delta_distance; 
 private Double delta_t;
+private Double db_t;
 private Double speed;
 private Double mov_avg_spd;
+private String humanReadableDate;
+
+  public Double getDb_t() {
+    return this.db_t;
+  }
+
+  public void setDb_t(Double db_t) {
+    this.db_t = db_t;
+  }
+
+  public String getHumanReadableDate() {
+    return this.humanReadableDate;
+  }
+
+  public void setHumanReadableDate(String humanReadableDate) {
+    this.humanReadableDate = humanReadableDate;
+  }
+
 public User_s(){
 
 }
@@ -43,6 +66,15 @@ public User_s(){
     return this.id;
   }
 
+ // Method inside the User_s class
+ public void updateHumanReadableDate() {
+     if (this.epochData != null) {
+         Instant instant = Instant.ofEpochMilli(this.epochData); // Convert microseconds to milliseconds
+         LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+         this.humanReadableDate = dateTime.format(formatter);
+     }
+ }
  
 
   public Double getDelta_distance() {
@@ -58,6 +90,8 @@ public User_s(){
   }
 
 
+
+
   @Override
   public String toString() {
     return "{" +
@@ -69,10 +103,14 @@ public User_s(){
       ", longitude='" + getLongitude() + "'" +
       ", delta_distance='" + getDelta_distance() + "'" +
       ", delta_t='" + getDelta_t() + "'" +
+      ", db_t='" + getDb_t() + "'" +
       ", speed='" + getSpeed() + "'" +
       ", mov_avg_spd='" + getMov_avg_spd() + "'" +
+      ", humanReadableDate='" + getHumanReadableDate() + "'" +
       "}";
   }
+
+ 
  
 
   public void setDelta_t(Double delta_t) {
