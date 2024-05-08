@@ -2,7 +2,7 @@ import { Component, OnInit ,ElementRef, ViewChild } from '@angular/core';
 import { User } from './user';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
+// import * as moment from 'moment';
 import 'chartjs-adapter-date-fns';
 import { ChartConfiguration, registerables } from 'chart.js';
 import  'chartjs-plugin-zoom';
@@ -265,15 +265,29 @@ loadPath(url: string): void {
             maxZoom: 17
           });
         }
-
-      } else {
-        console.error('Data is not in expected format:', response);
-      }
-    },
-    error: (err) => {
-      console.error('Error loading path data:', err);
+// Fetch additional data from GeoNames API for each point
+validPoints.forEach((point, index) => {
+  const geoNamesUrl = `http://api.geonames.org/findNearbyPlaceNameJSON?lat=${point.latitude}&lng=${point.longitude}&username=teja`;
+  this.http.get(geoNamesUrl).subscribe((geoNamesResponse: any) => {
+    // Handle GeoNames API response here
+    console.log('GeoNames API response:', geoNamesResponse);
+    // Add GeoNames data to feature
+    if (features[index]) {
+      features[index].getProperties()['data'].geoNames = geoNamesResponse;
     }
+  }, error => {
+    console.error('Error fetching data from GeoNames API:', error);
   });
+});
+
+} else {
+console.error('Data is not in expected format:', response);
+}
+},
+error: (err) => {
+console.error('Error loading path data:', err);
+}
+});
 }
 // Adjust the function to immediately return a Style object
 private createFeatureStyle(feature: Feature): Style {
@@ -348,90 +362,92 @@ private showPopup(content: string): void {
   }
 }
 
-private createPathStyle(): StyleFunction {
-  return (feature: FeatureLike, resolution: number): Style[] => {
-    // Get the geometry as a LineString; be careful with direct casting
-    const geometry = feature.getGeometry();
-    const data = feature.get('data');
-    // if (!(geometry instanceof LineString)) return []; // Ensure it's a LineString
+// private createPathStyle(): StyleFunction {
+//   return (feature: FeatureLike, resolution: number): Style[] => {
+//     // Get the geometry as a LineString; be careful with direct casting
+//     const geometry = feature.getGeometry();
+//     const data = feature.get('data');
+//     // if (!(geometry instanceof LineString)) return []; // Ensure it's a LineString
 
-    const styles: Style[] = [
-      new Style({
-        stroke: new Stroke({
-          color: '#0000FF',
-          width: 2
-        })
-      })
-    ];
+//     const styles: Style[] = [
+//       new Style({
+//         stroke: new Stroke({
+//           color: '#0000FF',
+//           width: 2
+//         })
+//       })
+//     ];
 
-    // Adding direction arrows; only if geometry is LineString and not RenderFeature
-    if (geometry instanceof LineString) {
-      geometry.forEachSegment((start, end) => {
-        const dx = end[0] - start[0];
-        const dy = end[1] - start[1];
-        const rotation = Math.atan2(dy, dx);
-        styles.push(new Style({
-          geometry: new Point(end),
-          image: new Icon({
-            src: 'assets/arrow.png',
-            anchor: [0.5, 0.5],
-            rotateWithView: true,
-            rotation: -rotation,
-            scale: 0.5
-          }),
-        // zIndex : 10
-        }));
-      });
-    }
+//     // Adding direction arrows; only if geometry is LineString and not RenderFeature
+//     if (geometry instanceof LineString) {
+//       geometry.forEachSegment((start, end) => {
+//         const dx = end[0] - start[0];
+//         const dy = end[1] - start[1];
+//         const rotation = Math.atan2(dy, dx);
+//         styles.push(new Style({
+//           geometry: new Point(end),
+//           image: new Icon({
+//             src: 'assets/arrow.png',
+//             anchor: [0.5, 0.5],
+//             rotateWithView: true,
+//             rotation: -rotation,
+//             scale: 0.5
+//           }),
+//         // zIndex : 10
+//         }));
+//       });
+//     }
 
-    return styles;
-  };
-}
+//     return styles;
+//   };
+// }
 
 
 
-private setupClickHandler(map: Map): void {
+// private setupClickHandler(map: Map): void {
   
-  map.on('click', (evt) => {
+//   map.on('click', (evt) => {
     
-    map.forEachFeatureAtPixel(evt.pixel, (feature) => {
-      if (feature instanceof Feature) { // Ensure it's a full feature
-        let styles: Style | Style[] | StyleFunction | undefined = feature.getStyle();
+//     map.forEachFeatureAtPixel(evt.pixel, (feature) => {
+//       if (feature instanceof Feature) { // Ensure it's a full feature
+//         let styles: Style | Style[] | StyleFunction | undefined = feature.getStyle();
 
-        // If styles is a StyleFunction, evaluate it to obtain Style or Style[]
-        // if (typeof styles === 'function') {
-        //   // Get the resolution, ensuring it is not undefined
-        //   const resolution = map.getView().getResolution() ?? 1; // Default to 1 if undefined
-        //   styles = styles(feature, resolution);
-        // }
+//         // If styles is a StyleFunction, evaluate it to obtain Style or Style[]
+//         // if (typeof styles === 'function') {
+//         //   // Get the resolution, ensuring it is not undefined
+//         //   const resolution = map.getView().getResolution() ?? 1; // Default to 1 if undefined
+//         //   styles = styles(feature, resolution);
+//         // }
 
-        // Check if styles is an array or a single style object
-        if (Array.isArray(styles)) {
-          // Process each style to find the arrow icon
-          if (styles.some(style => this.isArrowIcon(style))) {
-            const user = feature.getProperties();
+//         // Check if styles is an array or a single style object
+//         if (Array.isArray(styles)) {
+//           // Process each style to find the arrow icon
+//           if (styles.some(style => this.isArrowIcon(style))) {
+//             const user = feature.getProperties();
             
-            // this.displayData(user, evt.coordinate); // Pass coordinate for positioning popup
-            return true; // Stop processing other features
-          }
-        } 
-        // else if (styles && this.isArrowIcon(styles)) {
-        //   // Check a single style object
-        //   const user = feature.getProperties();
-        //   // this.displayData(user, evt.coordinate);
-        //   return true;
-        // }
-      }
-      return false; // Continue to next feature if no match found
-    });
-  });
-}
+//             // this.displayData(user, evt.coordinate); // Pass coordinate for positioning popup
+//             return true; // Stop processing other features
+//           }
+//         } 
+//         // else if (styles && this.isArrowIcon(styles)) {
+//         //   // Check a single style object
+//         //   const user = feature.getProperties();
+//         //   // this.displayData(user, evt.coordinate);
+//         //   return true;
+//         // }
+//       }
+//       return false; // Continue to next feature if no match found
+//     });
+//   });
+// }
 
 private isArrowIcon(style: Style): boolean {
   const image = style.getImage();
   return image instanceof Icon && image.getSrc() === 'assets/arrow.png';
 }
-
+close():void{
+  this.selectedData = null;
+}
 
 private getChartOptions() {
   return {

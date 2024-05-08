@@ -8,7 +8,7 @@
   <p><strong>Longitude:</strong> {{ selectedData.longitude }}</p>
   <p><strong>Speed:</strong> {{ selectedData.speed }} m/s</p>
   <p><strong>Date:</strong> {{ selectedData.humanReadableDate }}
-  
+  <button click="close()">close</button>
 </div>
 <!-- map.component.html -->
 <div #mapContainer class="map"></div>  <!-- Note the #mapContainer used here -->
@@ -123,8 +123,8 @@
 </div>
 <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script> -->
 <!-- Angular template file -->
-<button (click)="zoomChart('in')">Zoom In</button>
-<button (click)="zoomChart('out')">Zoom Out</button>
+<!-- <button (click)="zoomChart('in')">Zoom In</button>
+<button (click)="zoomChart('out')">Zoom Out</button> -->
 <canvas id="canvas"></canvas>
 <div id="mmap" class="map"></div>
 <!-- <canvas id="canvas"></canvas> -->
