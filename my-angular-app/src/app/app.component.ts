@@ -111,7 +111,7 @@ export class AppComponent implements OnInit{
         })
       ])
     });
-
+    
     // this.loadPath(url);
     // this.setupClickHandler(this.map);
       // Optionally remove attribution control
@@ -233,7 +233,7 @@ loadPath(url: string): void {
           image: new CircleStyle({
             radius: 7,
             fill: new Fill({ color: 'green' }),
-            stroke: new Stroke({ color: 'black', width: 2 })
+            stroke: new Stroke({ color: 'black', width: 5 })
           })
         }));
 
@@ -242,7 +242,7 @@ loadPath(url: string): void {
           image: new CircleStyle({
             radius: 7,
             fill: new Fill({ color: 'red' }),
-            stroke: new Stroke({ color: 'black', width: 2 })
+            stroke: new Stroke({ color: 'black', width: 5 })
           })
         }));
 
@@ -270,7 +270,7 @@ validPoints.forEach((point, index) => {
   const geoNamesUrl = `http://api.geonames.org/findNearbyPlaceNameJSON?lat=${point.latitude}&lng=${point.longitude}&username=teja`;
   this.http.get(geoNamesUrl).subscribe((geoNamesResponse: any) => {
     // Handle GeoNames API response here
-    console.log('GeoNames API response:', geoNamesResponse);
+    // console.log('GeoNames API response:', geoNamesResponse);
     // Add GeoNames data to feature
     if (features[index]) {
       features[index].getProperties()['data'].geoNames = geoNamesResponse;
@@ -325,6 +325,7 @@ ngAfterViewInit(): void {
 
         // console.log('Latitude: ', formattedLat, '\nLongitude: ', formattedLon);
         this.selectedData = feature.get('data');
+        console.log(this.selectedData);
         return true; // Stop iterating through other features
       }
       return false; // Continue to next feature if this is not a Point
@@ -445,7 +446,8 @@ private isArrowIcon(style: Style): boolean {
   const image = style.getImage();
   return image instanceof Icon && image.getSrc() === 'assets/arrow.png';
 }
-close():void{
+
+close() {
   this.selectedData = null;
 }
 

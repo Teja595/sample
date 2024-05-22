@@ -8,10 +8,10 @@
   <p><strong>Longitude:</strong> {{ selectedData.longitude }}</p>
   <p><strong>Speed:</strong> {{ selectedData.speed }} m/s</p>
   <p><strong>Date:</strong> {{ selectedData.humanReadableDate }}
-  <button click="close()">close</button>
+  <p><button (click)="close()">Close</button></p>
 </div>
 <!-- map.component.html -->
-<div #mapContainer class="map"></div>  <!-- Note the #mapContainer used here -->
+<!-- <div #mapContainer class="map"></div>  Note the #mapContainer used here -->
 <div #popupContainer class="ol-popup"> <!-- And #popupContainer here -->
   <a href="#" #popupCloser class="ol-popup-closer"></a>
   <div #popupContent></div>
