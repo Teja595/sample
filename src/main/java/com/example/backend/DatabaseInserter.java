@@ -60,9 +60,10 @@ public class DatabaseInserter {
                             long epochData = record.get("epoch_data").asLong();
                             // Check if epochData is unique
                             if (uniqueEpochData.add(epochData)) {
-                                // Only parse and add the user if the epochData is unique
                                 User_s user = parseUser(record);
-                                allUsers.add(user);
+                        // if (!isDuplicate(user)) {
+                            allUsers.add(user);
+                        // }
                             }
                         }
                     }
@@ -72,7 +73,12 @@ public class DatabaseInserter {
                 userServiceImpl.processAndStoreData(allUsers);
             }
             
-
+              // Helper method to check if epoch_data is already present in the database
+    private boolean isDuplicate(User_s user) {
+          String sql = "SELECT COUNT(*) FROM user_s WHERE epoch_data = ? AND latitude = ? AND longitude = ?";
+          Integer count = jdbcTemplate.queryForObject(sql, new Object[]{user.getEpochData(), user.getLatitude(), user.getLongitude()}, Integer.class);
+          return count != null && count > 0;
+      }
         
             // Helper method to parse a JsonNode to a User_s object, assuming you have setters for all fields in User_s
     private User_s parseUser(JsonNode record) {

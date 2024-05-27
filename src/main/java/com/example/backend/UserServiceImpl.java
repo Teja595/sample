@@ -54,7 +54,7 @@ import java.util.LinkedList;
     public void processAndStoreData(List<User_s> allFetchedData) {
         // Sort data by epoch_data
         allFetchedData.sort(Comparator.comparingLong(User_s::getEpochData));
-    
+    // System.out.println(allFetchedData);
         // Step 1: Filter the data based on distance criteria
         List<User_s> distanceFilteredData = filterDataByMinimumDistance(allFetchedData);
         
@@ -65,40 +65,13 @@ import java.util.LinkedList;
         // List<User_s> speedFilteredData = filterDataBySpeed(distanceFilteredData, 10.0, 65.0);
         
         // Step 4: Calculate remaining fields like delta distances, delta_t, etc., only on the speed-filtered data
-        calculateFields(distanceFilteredData);
+        calculateFieldss(distanceFilteredData);
     
         // Store the fully processed and filtered data
         userRepository.saveAll(distanceFilteredData);
     }
     
-    private List<User_s> calculateAndFilterSpeeds(List<User_s> users) {
-       
-        List<User_s> validSpeedUsers = new ArrayList<>();  // List to hold users with valid speeds
-        if (users.size() < 2) return validSpeedUsers;  // Return empty list if not enough users to calculate speed
     
-        User_s previousUser = users.get(0);
-        validSpeedUsers.add(previousUser);  // Optionally add the first user unconditionally
-    
-        for (int i = 1; i < users.size(); i++) {
-            User_s currentUser = users.get(i);
-    
-            double deltaDistance = haversineDistance(previousUser.getLatitude(), previousUser.getLongitude(), 
-                                                     currentUser.getLatitude(), currentUser.getLongitude());
-            double deltaTime = (currentUser.getEpochData() - previousUser.getEpochData()) / 1000.0; // Convert ms to seconds
-            
-            if (deltaTime > 0) {
-                
-                double speed = (deltaDistance / deltaTime) * 3.6; // Convert m/s to km/h
-                System.out.println(speed);
-                if (speed > 10.0 && speed < 65.0) {
-                    currentUser.setSpeed(speed);
-                    validSpeedUsers.add(currentUser);  // Add only if speed is within the desired range
-                }
-            }
-            previousUser = currentUser;  // Update previousUser for the next calculation
-        }
-        return validSpeedUsers;
-    }
     
     
     
@@ -124,40 +97,6 @@ private List<User_s> filterDataByMinimumDistance(List<User_s> users) {
             previous = current;
         }
     }
-
-    return filteredUsers;
-}
-
-private List<User_s> filterDataBySpeed(List<User_s> users, double minSpeed, double maxSpeed) {
-    // System.out.println("Before filtering:");
-    // users.forEach(user -> System.out.println("Speed: " + (user.getSpeed() == null ? "null" : user.getSpeed())));
-
-    // Check if the list is empty to avoid IndexOutOfBoundsException
-    if (users.isEmpty()) {
-        return new ArrayList<>(); // Return an empty list if no users are present
-    }
-
-    // Extract the first user to ensure it is not filtered
-    User_s firstUser = users.get(0);
-    List<User_s> remainingUsers = users.subList(1, users.size()); // Exclude the first user for filtering
-
-    List<User_s> filteredUsers = new ArrayList<>();
-    filteredUsers.add(firstUser); // Add the first user back unconditionally
-
-    try {
-        // Apply the speed filter to the remaining users
-        List<User_s> filteredRemainingUsers = remainingUsers.stream()
-            .filter(user -> user.getSpeed() != null && user.getSpeed() >= minSpeed && user.getSpeed() <= maxSpeed)
-            .collect(Collectors.toList());
-        filteredUsers.addAll(filteredRemainingUsers); // Add the filtered users
-
-        // System.out.println("After filtering:");
-        // filteredUsers.forEach(user -> System.out.println("Speed: " + user.getSpeed()));
-    } catch (Exception e) {
-        System.out.println("Error during filtering: " + e.getMessage());
-        e.printStackTrace();
-    }
-    System.out.println(filteredUsers);
 
     return filteredUsers;
 }
@@ -231,23 +170,91 @@ private void calculateFields(List<User_s> users) {
     users.clear();
     users.addAll(usersWithValidAverageSpeeds);
 }
+Boolean flag = true;
 
-
-private List<User_s> filterByMinimumDistance(List<User_s> users, double minDistance) {
-    List<User_s> filteredUsers = new ArrayList<>();
-    User_s previous = users.get(0);
-    filteredUsers.add(previous);
-
-    for (int i = 1; i < users.size(); i++) {
-        User_s current = users.get(i);
-        double deltaDistance = haversineDistance(previous.getLatitude(), previous.getLongitude(), current.getLatitude(), current.getLongitude());
-        if (deltaDistance >= minDistance) {
-            filteredUsers.add(current);
-            previous = current; // Only update previous if current is added
-        }
+private void calculateFieldss(List<User_s> users) {
+    if (users.isEmpty()) {
+        return;
     }
-    return filteredUsers;
-}    
+
+    List<User_s> filteredUsers = users; // No filtering is being applied here
+    if (filteredUsers.isEmpty()) {
+        return; // Exit if no valid entries after filtering
+    }
+
+    // Flag check and debug print
+    // if (flag) {
+    //     System.out.println(users);
+    //     flag = false;
+    // }
+
+    LinkedList<Double> speedWindow = new LinkedList<>();
+    User_s previous = null; // Initialize previous as null
+    List<User_s> usersWithValidAverageSpeeds = new ArrayList<>();
+
+    for (User_s current : filteredUsers) {
+        if (previous == null || !isSameDay(previous.getEpochData(), current.getEpochData())) {
+            current.setDelta_distance(0.0);
+            current.setSpeed(0.0);
+            current.setDelta_t(0.0);
+            current.setMov_avg_spd(0.0);
+            current.updateHumanReadableDate();
+
+            // Initialize the sliding window for the new day
+            speedWindow.clear();
+            speedWindow.add(0.0); // Starting with a speed of 0.0 km/h
+        } else {
+            double deltaDistance = haversineDistance(previous.getLatitude(), previous.getLongitude(), current.getLatitude(), current.getLongitude());
+            double deltaTime = (current.getEpochData() - previous.getEpochData()) / 1000.0; // Convert milliseconds to seconds
+
+            if (deltaTime > 0) {
+                double speed = (deltaDistance / deltaTime) * 3600; // Convert meters per second to kilometers per hour
+                current.setSpeed(speed);
+                current.setDelta_distance(deltaDistance);
+                current.setDelta_t(deltaTime);
+                current.updateHumanReadableDate();
+
+                // Update the sliding window for moving average speed
+                speedWindow.add(speed);
+                if (speedWindow.size() > 5) {
+                    speedWindow.removeFirst();
+                }
+                double averageSpeed = speedWindow.stream().mapToDouble(a -> a).sum() / speedWindow.size();
+                current.setMov_avg_spd(averageSpeed);
+
+                // Add to list only if moving average speed is within the specified range
+                if (averageSpeed >= 10 && averageSpeed < 65) {
+                    usersWithValidAverageSpeeds.add(current);
+                }
+            }
+        }
+        previous = current; // Update the previous user to the current one
+    }
+    // Logging to verify the contents of filteredUsers before saving
+        // System.out.println("Filtered Users Size: " + filteredUsers.size());
+        // for (User_s user : filteredUsers) {
+        //     System.out.println(user);
+        // }
+    // Logging to verify the contents of filteredUsers before saving
+    // System.out.println("avgspeed Users Size: " + usersWithValidAverageSpeeds.size());
+    // for (User_s user : usersWithValidAverageSpeeds) {
+    //     System.out.println(user);
+    // }
+    // Replace original user list with the one containing valid average speeds
+    users.clear();
+    users.addAll(usersWithValidAverageSpeeds);
+}
+
+// Helper method to check if two timestamps are on the same day
+private boolean isSameDay(long epoch1, long epoch2) {
+    Calendar cal1 = Calendar.getInstance();
+    cal1.setTimeInMillis(epoch1);
+    Calendar cal2 = Calendar.getInstance();
+    cal2.setTimeInMillis(epoch2);
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+           cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+}
+   
   }
 
 

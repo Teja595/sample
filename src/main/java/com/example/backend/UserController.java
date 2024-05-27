@@ -21,7 +21,7 @@ import org.springframework.data.domain.Pageable;
 
   @RestController
   @RequestMapping("/x")
-  @CrossOrigin
+ @CrossOrigin(origins = "http://localhost:4200")
   public class UserController {
     
     private final UserService userService;
@@ -33,6 +33,7 @@ import org.springframework.data.domain.Pageable;
     public List<Object[]> getUniqueDeviceIds() {
         return userService.getDeviceIdCounts();
     }
+   
     @GetMapping("/totalDistance")
     public ResponseEntity<?> getTotalDistance(
             @RequestParam("deviceId") String deviceId,
@@ -95,6 +96,7 @@ import org.springframework.data.domain.Pageable;
         }
     }
     
-  }
+}
+
 
 
