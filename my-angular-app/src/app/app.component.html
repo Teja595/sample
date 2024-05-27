@@ -1,0 +1,134 @@
+<!-- map.component.html -->
+<div id="map" class="map"></div>
+<div *ngIf="selectedData"  class="census-data-overlay">
+  <h3>Feature Details:</h3>
+  <!-- <p><strong>ID:</strong> {{ selectedData.id }}</p> -->
+  <p><strong>Device ID:</strong> {{ selectedData.deviceId }}</p>
+  <p><strong>Latitude:</strong> {{ selectedData.latitude }}</p>
+  <p><strong>Longitude:</strong> {{ selectedData.longitude }}</p>
+  <p><strong>Speed:</strong> {{ selectedData.speed }} m/s</p>
+  <p><strong>Date:</strong> {{ selectedData.humanReadableDate }}
+  <p><button (click)="close()">Close</button></p>
+</div>
+<!-- map.component.html -->
+<!-- <div #mapContainer class="map"></div>  Note the #mapContainer used here -->
+<div #popupContainer class="ol-popup"> <!-- And #popupContainer here -->
+  <a href="#" #popupCloser class="ol-popup-closer"></a>
+  <div #popupContent></div>
+</div>
+<!-- app.component.html -->
+
+<div>
+  <h2>{{ title }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Device ID</th>
+        <th>Count</th>
+        <th>Distance (km)</th>
+        <th>Time Difference</th> <!-- Header for time difference -->
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let device of deviceIdCounts"> <!-- Make sure you're iterating over the correct array -->
+        <td>{{ device.deviceId }}</td>
+        <td>{{ device.count }}</td>
+        <td>{{ device.distance }}</td>
+        <td>{{ device.timeDifference }}</td> <!-- Displaying the calculated time difference -->
+        <td>{{ device.start_date }}</td>
+        <td>{{ device.end_date }}</td>
+        <td><button (click)="goToDeviceDetails(device.deviceId,device.start_date,device.end_date)">View Details</button></td>
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+<div *ngIf="detailsRequested">
+<div class="filter-input-container">
+  <input type="text" [(ngModel)]="deviceId" placeholder="Enter Device ID" />
+  <input type="datetime-local" [(ngModel)]="startDate" placeholder="Start Date" />
+  <input type="datetime-local" [(ngModel)]="endDate" placeholder="End Date" />
+  <button (click)="fetchDataWithFilters()">Fetch Data</button>
+  <button (click)="downloadReport(deviceId,startDate,endDate)">Download Report</button>
+  <div class="total-distance">
+  <div>{{ totalRows }} rows found </div><!-- Display total rows here -->
+
+<div>Total Distance: {{ totalDistance | number:'1.2-2' }} km</div>
+  </div>
+  
+</div>
+
+
+<!-- Conditionally display the table only if there are users -->
+<div *ngIf="users.length > 0; else noRecords">
+  <h2>{{ title }}</h2>
+  <div class="table-container">
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Device ID</th>
+          <th>Epoch Data</th>
+          <th>Epoch Stored</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>delta distance(km)</th>
+          <th>delta_t(sec)</th>
+          <!-- <th>db_t</th> -->
+          <th>speed(km/hr)</th>
+          <th>mov_avg_spd</th>
+          <th>Date and time</th>
+          <th>Active</th> <!-- New Column Header -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.deviceId }}</td>
+          <td>{{ user.epochData }}</td>
+          <td>{{ user.epochStored }}</td>
+          <td>{{ user.latitude }}</td>
+          <td>{{ user.longitude }}</td>
+          <td>{{ user.delta_distance }}</td>
+          <td>{{ user.delta_t }}</td>
+          <!-- <td>{{user.db_t}}</td> -->
+          <td>{{ user.speed }}</td>
+          <td>{{ user.mov_avg_spd }}</td>
+          <td>{{user.humanReadableDate}}</td>
+          <td [ngClass]="user.isActive ? 'active' : 'inactive'">{{ user.isActive ? 'True' : 'False' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="button-container">
+    <button (click)="onPrevClick()" [disabled]="currentPage <= 0">Previous</button>
+    <button (click)="onNextClick()" [disabled]="currentPage >= totalPages - 1">Next</button>
+  </div>
+</div>
+<!-- Basic Modal for Displaying Feature Data -->
+
+
+<!-- Template for no records message -->
+<ng-template #noRecords>
+  <div class="no-records-message">
+    No records present.
+  </div>
+</ng-template>
+</div>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script> -->
+<!-- Angular template file -->
+<!-- <button (click)="zoomChart('in')">Zoom In</button>
+<button (click)="zoomChart('out')">Zoom Out</button> -->
+<canvas id="canvas"></canvas>
+<div id="mmap" class="map"></div>
+<!-- <canvas id="canvas"></canvas> -->
+
+
+<!-- Message display goes here -->
+<!-- <div *ngIf="message" class="message">{{ message }}</div> -->
