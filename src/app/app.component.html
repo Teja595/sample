@@ -1,0 +1,134 @@
+<div class="container">
+  <div id="map" class="map">
+    <div *ngIf="selectedData" class="census-data-overlay">
+      <h3>Feature Details:</h3>
+      <p><strong>Device ID:</strong> {{ selectedData.deviceId }}</p>
+      <p><strong>Latitude:</strong> {{ selectedData.latitude }}</p>
+      <p><strong>Longitude:</strong> {{ selectedData.longitude }}</p>
+      <p><strong>Speed:</strong> {{ selectedData.speed }}</p>
+      <p><strong>Date:</strong> {{ selectedData.humanReadableDate }}</p>
+
+      <div *ngIf="selectedData.geoNames && selectedData.geoNames.geonames.length">
+        <h4>GeoNames:</h4>
+        <div *ngFor="let geoName of selectedData.geoNames.geonames">
+          <p><strong>Name:</strong> {{ geoName.name }}</p>
+          <p><strong>Country:</strong> {{ geoName.countryName }}</p>
+          <p><strong>Latitude:</strong> {{ geoName.lat }}</p>
+          <p><strong>Longitude:</strong> {{ geoName.lng }}</p>
+          <p><strong>Admin Name:</strong> {{ geoName.adminName1 }}</p>
+          <p><strong>Distance:</strong> {{ geoName.distance }} km</p>
+          <hr />
+        </div>
+      </div>
+
+      <button (click)="close()">Close</button>
+    </div>
+    <!-- <div #popupContainer class="ol-popup">
+      <a href="#" #popupCloser class="ol-popup-closer"></a>
+      <div #popupContent></div>
+    </div> -->
+  </div>
+</div>
+
+<div class="main-content">
+  <h2>{{ title }}</h2>
+  <div class="device-selection-container">
+    <div class="left-side">
+      <label for="device-search">Search Device ID:</label>
+      <input id="device-search" type="text" [(ngModel)]="searchTerm" placeholder="Type to search..." (input)="filterDevices()">
+
+
+      <label for="device-select">Select Device ID:</label>
+      <select id="device-select" (change)="onDeviceSelect($event)">
+        <option *ngFor="let device of filteredDeviceIdCounts" [value]="device.deviceId">
+          {{ device.deviceId }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="selectedDevice" class="selected-device-details">
+    <h3>Selected Device Details</h3>
+    <p><strong>Device ID:</strong> {{ selectedDevice.deviceId }}</p>
+    <p><strong>Total Count:</strong> {{ selectedDevice.count }}</p>
+    <p><strong>Total Distance:</strong> {{ totalDistance }} Km</p>
+    <p><strong>Time Difference:</strong> {{ totaltime }} hrs</p>
+    <p><strong>Start Date:</strong> {{ selectedDevice.start_date }}</p>
+    <p><strong>End Date:</strong> {{ selectedDevice.end_date }}</p>
+    <!-- <button (click)="goToDeviceDetails(selectedDevice.deviceId, selectedDevice.start_date, selectedDevice.end_date)">View Details</button> -->
+  </div>
+  <div *ngIf="detailsRequested" class="details-container">
+    <div class="filter-input-container">
+      <input type="text" [(ngModel)]="deviceId" placeholder="Enter Device ID" />
+      <input type="datetime-local" [(ngModel)]="startDate" placeholder="Start Date" />
+      <input type="datetime-local" [(ngModel)]="endDate" placeholder="End Date" />
+      <div>
+        <label for="rows-per-page">Rows per page:</label>
+        <input id="rows-per-page" type="number" [(ngModel)]="rowsPerPage" (change)="onRowsPerPageChange()" min="1" max="2000">
+      </div>
+      <button class="small-button" (click)="fetchDataWithFilters()">Fetch Data</button>
+      <button class="small-button" (click)="downloadReport(deviceId, startDate, endDate)">Download Report</button>
+      <div class="total-distance-box">
+        <div>Distance: {{ totalDist | number:'1.2-2' }} km</div>
+        <!-- <div>Time: {{ totaltime | number:'1.2-2' }} hrs</div> -->
+      </div>
+    </div>
+
+    <div *ngIf="users.length > 0; else noRecords">
+      <h2>{{ title }}</h2>
+      <div class="table-container">
+        <table border="1">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Device ID</th>
+              <th>Epoch Data</th>
+              <th>Epoch Stored</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>delta distance(km)</th>
+              <th>delta_t(sec)</th>
+              <th>speed(km/hr)</th>
+              <th>mov_avg_spd</th>
+              <th>Date and time</th>
+              <th>Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>{{ user.id }}</td>
+              <td>{{ user.deviceId }}</td>
+              <td>{{ user.epochData }}</td>
+              <td>{{ user.epochStored }}</td>
+              <td>{{ user.latitude }}</td>
+              <td>{{ user.longitude }}</td>
+              <td>{{ user.delta_distance }}</td>
+              <td>{{ user.delta_t }}</td>
+              <td>{{ user.speed }}</td>
+              <td>{{ user.mov_avg_spd }}</td>
+              <td>{{ user.humanReadableDate }}</td>
+              <td [ngClass]="user.isActive ? 'active' : 'inactive'">{{ user.isActive ? 'True' : 'False' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="button-container">
+        <button (click)="onPrevClick()" [disabled]="currentPage <= 0">Previous</button>
+        <button (click)="onNextClick()" [disabled]="currentPage >= totalPages - 1">Next</button>
+      </div>
+      <div class="page-info">
+        Page {{ currentPage + 1 }} of {{ totalPages }}
+      </div>
+    </div>
+
+    <ng-template #noRecords>
+      <div class="no-records-message">
+        No records present.
+      </div>
+    </ng-template>
+    <canvas id="canvas"></canvas>
+<!-- <div id="mmap" class="map"></div> -->
+
+  </div>
+  
+</div>
