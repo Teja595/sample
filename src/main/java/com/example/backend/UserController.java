@@ -21,19 +21,20 @@ import org.springframework.data.domain.Pageable;
 
   @RestController
   @RequestMapping("/x")
- @CrossOrigin(origins = "http://localhost:4200")
+ @CrossOrigin
   public class UserController {
     
     private final UserService userService;
     @Autowired
     public UserController(UserService userService) {
       this.userService = userService;
+      
     }
     @GetMapping("/unique-device-ids")
     public List<Object[]> getUniqueDeviceIds() {
         return userService.getDeviceIdCounts();
     }
-   
+  
     @GetMapping("/totalDistance")
     public ResponseEntity<?> getTotalDistance(
             @RequestParam("deviceId") String deviceId,
@@ -50,9 +51,16 @@ import org.springframework.data.domain.Pageable;
             if (startEpoch >= endEpoch) {
                 return ResponseEntity.badRequest().body("The start time must be before the end time.");
             }
-    
-            double totalDistance = userService.findTotalDistanceByDeviceIdAndEpochDataBetween(deviceId, startEpoch, endEpoch);
-            return ResponseEntity.ok(Map.of("totalDistance", totalDistance));
+            // double totalDurationInHours = userService.calculateTotalDurationInHours(deviceId, startEpoch, endEpoch);
+            // double totalDistance = userService.findTotalDistanceByDeviceIdAndEpochDataBetween(deviceId, startEpoch, endEpoch);
+        double[] durationAndDistance = userService.calculateTotalDurationAndDistance(deviceId, startEpoch, endEpoch);
+        double totalDurationInHours = durationAndDistance[0];
+        double totalDistance = durationAndDistance[1];
+            System.out.println(totalDurationInHours);
+            return ResponseEntity.ok(Map.of(
+                "totalDurationInHours", totalDurationInHours,
+                "totalDistance", totalDistance
+            ));
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("Failed to parse date-time: " + e.getMessage());
         } catch (Exception e) {

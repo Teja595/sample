@@ -33,7 +33,7 @@ public class DataFetchService {
         this.objectMapper = objectMapper;
     }
 
-    @Scheduled(fixedRate = 3600000) // Run every hour
+    @Scheduled(fixedRate = 450000) // Run every hour
     public void fetchData() {
         try {
             // databaseInserter.clearDatabase();
@@ -106,7 +106,7 @@ public class DataFetchService {
         OkHttpClient client = createHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
         long currentTimeInSeconds = Instant.now().getEpochSecond();
-        long previousDayTimeInSeconds = Instant.now().minus(4, ChronoUnit.DAYS).getEpochSecond();
+        long previousDayTimeInSeconds = Instant.now().minus(1, ChronoUnit.DAYS).getEpochSecond();
 
         Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("deviceID", deviceId);

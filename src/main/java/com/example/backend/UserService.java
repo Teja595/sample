@@ -1,5 +1,7 @@
 package com.example.backend;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 public interface UserService {
@@ -13,6 +15,9 @@ public interface UserService {
   public List<Object[]> getDeviceIdCounts();
   // Add this new method
   Double findTotalDistanceByDeviceIdAndEpochDataBetween(String deviceId, Long startEpoch, Long endEpoch);
+  double calculateTotalDurationInHours(String deviceId, long startDate, long endDate);
+  double[] calculateTotalDurationAndDistance(String deviceId, long startDate, long endDate);
+  Map<String, Double[]> calculateTotalDurationsAndDistances(List<User_s> users);
 }
 
 

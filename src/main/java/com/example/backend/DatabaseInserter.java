@@ -75,8 +75,8 @@ public class DatabaseInserter {
             
               // Helper method to check if epoch_data is already present in the database
     private boolean isDuplicate(User_s user) {
-          String sql = "SELECT COUNT(*) FROM user_s WHERE epoch_data = ? AND latitude = ? AND longitude = ?";
-          Integer count = jdbcTemplate.queryForObject(sql, new Object[]{user.getEpochData(), user.getLatitude(), user.getLongitude()}, Integer.class);
+          String sql = "SELECT COUNT(*) FROM user_s WHERE epoch_data = ? AND device_id = ?";
+          Integer count = jdbcTemplate.queryForObject(sql, new Object[]{user.getEpochData(), user.getDeviceId()}, Integer.class);
           return count != null && count > 0;
       }
         

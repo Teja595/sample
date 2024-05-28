@@ -31,6 +31,7 @@ Set<Long> findAllEpochData();
     // Double findTotalDistanceByDeviceIdAndEpochDataBetween(@Param("deviceId") String deviceId, @Param("startEpoch") Long startEpoch, @Param("endEpoch") Long endEpoch);
     @Query(value = "SELECT SUM(d.delta_distance) FROM ts d WHERE d.device_id = :deviceId AND d.epoch_data BETWEEN :startEpoch AND :endEpoch", nativeQuery = true)
 Double findTotalDistanceByDeviceIdAndEpochDataBetween(@Param("deviceId") String deviceId, @Param("startEpoch") Long startEpoch, @Param("endEpoch") Long endEpoch);
-
+@Query("SELECT u FROM User_s u WHERE u.deviceId = :deviceId AND u.epochData BETWEEN :startDate AND :endDate")
+    List<User_s> findAllByDeviceIdAndEpochDataBetween(String deviceId, long startDate, long endDate);
 
 }

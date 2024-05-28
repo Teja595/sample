@@ -37,7 +37,15 @@ import java.util.LinkedList;
     // public User_s save(User_s user) {
     //   return userRepository.save(user);
     // }
+    public double calculateTotalDurationInHours(String deviceId, long startDate, long endDate) {
+        List<User_s> users = userRepository.findAllByDeviceIdAndEpochDataBetween(deviceId, startDate, endDate);
 
+        double totalDurationInSeconds = users.stream()
+            .mapToDouble(User_s::getDelta_t)
+            .sum();
+
+        return totalDurationInSeconds / 3600.0; // Convert seconds to hours
+    }
     @Override
     public Page<User_s> findAll(Pageable pageable) {
         return userRepository.findAll(pageable);
@@ -66,14 +74,61 @@ import java.util.LinkedList;
         
         // Step 4: Calculate remaining fields like delta distances, delta_t, etc., only on the speed-filtered data
         calculateFieldss(distanceFilteredData);
+    // Fetch existing data from the database to check for duplicates
+        List<User_s> existingData = userRepository.findAll();
+    
+        // Use a Set to track unique records based on some unique combination of fields (e.g., epochData, userId)
+        Set<String> uniqueKeys = existingData.stream()
+                .map(user -> user.getEpochData() + "_" + user.getDeviceId())
+                .collect(Collectors.toSet());
+    
+        // Filter out duplicates from the distanceFilteredData
+        List<User_s> uniqueDataToStore = distanceFilteredData.stream()
+                .filter(user -> uniqueKeys.add(user.getEpochData() + "_" + user.getDeviceId()))
+                .collect(Collectors.toList());
     
         // Store the fully processed and filtered data
-        userRepository.saveAll(distanceFilteredData);
+        userRepository.saveAll(uniqueDataToStore);
     }
     
     
     
     
+    public double[] calculateTotalDurationAndDistance(String deviceId, long startDate, long endDate) {
+        List<User_s> users = userRepository.findAllByDeviceIdAndEpochDataBetween(deviceId, startDate, endDate);
+    
+        Map<String, Double[]> totalDurationsAndDistances = calculateTotalDurationsAndDistances(users);
+    
+        Double[] durationAndDistance = totalDurationsAndDistances.getOrDefault(deviceId, new Double[]{0.0, 0.0});
+        double totalDurationInHours = durationAndDistance[0]; // Already in hours
+        double totalDistance = durationAndDistance[1]; // Distance in kilometers
+    
+        return new double[]{totalDurationInHours, totalDistance};
+    }
+    
+    public Map<String, Double[]> calculateTotalDurationsAndDistances(List<User_s> users) {
+        Map<String, Double[]> totalDurationsAndDistances = new HashMap<>();
+    
+        for (User_s user : users) {
+            String deviceId = user.getDeviceId();
+            double deltaTime = user.getDelta_t();
+            double deltaDistance = user.getDelta_distance(); // Distance in kilometers
+    
+            Double[] durationAndDistance = totalDurationsAndDistances.getOrDefault(deviceId, new Double[]{0.0, 0.0});
+            durationAndDistance[0] += deltaTime; // Accumulate time in seconds
+            durationAndDistance[1] += deltaDistance; // Accumulate distance in kilometers
+    
+            totalDurationsAndDistances.put(deviceId, durationAndDistance);
+        }
+    
+        // Convert total durations from seconds to hours
+        for (Map.Entry<String, Double[]> entry : totalDurationsAndDistances.entrySet()) {
+            Double[] durationAndDistance = entry.getValue();
+            durationAndDistance[0] = durationAndDistance[0] / 3600.0; // Convert seconds to hours
+        }
+    
+        return totalDurationsAndDistances;
+    }
     
  
     
@@ -230,20 +285,46 @@ private void calculateFieldss(List<User_s> users) {
         }
         previous = current; // Update the previous user to the current one
     }
-    // Logging to verify the contents of filteredUsers before saving
-        // System.out.println("Filtered Users Size: " + filteredUsers.size());
-        // for (User_s user : filteredUsers) {
-        //     System.out.println(user);
-        // }
-    // Logging to verify the contents of filteredUsers before saving
-    // System.out.println("avgspeed Users Size: " + usersWithValidAverageSpeeds.size());
-    // for (User_s user : usersWithValidAverageSpeeds) {
-    //     System.out.println(user);
-    // }
-    // Replace original user list with the one containing valid average speeds
+  // Calculate total durations and distances for each device ID
+  Map<String, Double[]> totalDurationsAndDistances = calculateTotalDurationsAndDistances(usersWithValidAverageSpeeds);
+
+  // Store or log total durations and distances as needed
+  for (Map.Entry<String, Double[]> entry : totalDurationsAndDistances.entrySet()) {
+      String deviceId = entry.getKey();
+      Double[] durationAndDistance = entry.getValue();
+      Double totalDurationInHours = durationAndDistance[0];
+      Double totalDistance = durationAndDistance[1];
+      System.out.println("Device ID: " + deviceId + ", Total Duration: " + totalDurationInHours + " hours, Total Distance: " + totalDistance + " km");
+  }
+    
     users.clear();
     users.addAll(usersWithValidAverageSpeeds);
 }
+// private Map<String, Double[]> calculateTotalDurationsAndDistances(List<User_s> users) {
+//     Map<String, Double[]> totalDurationsAndDistances = new HashMap<>();
+
+//     for (User_s user : users) {
+//         String deviceId = user.getDeviceId();
+//         double deltaTime = user.getDelta_t();
+//         double deltaDistance = user.getDelta_distance(); // Distance in kilometers
+
+//         Double[] durationAndDistance = totalDurationsAndDistances.getOrDefault(deviceId, new Double[]{0.0, 0.0});
+//         durationAndDistance[0] += deltaTime; // Accumulate time in seconds
+//         durationAndDistance[1] += deltaDistance; // Accumulate distance in kilometers
+
+//         totalDurationsAndDistances.put(deviceId, durationAndDistance);
+//     }
+
+//     // Convert total durations from seconds to hours
+//     for (Map.Entry<String, Double[]> entry : totalDurationsAndDistances.entrySet()) {
+//         Double[] durationAndDistance = entry.getValue();
+//         durationAndDistance[0] = durationAndDistance[0] / 3600.0; // Convert seconds to hours
+//     }
+
+//     return totalDurationsAndDistances;
+// }
+
+
 
 // Helper method to check if two timestamps are on the same day
 private boolean isSameDay(long epoch1, long epoch2) {
