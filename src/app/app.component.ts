@@ -73,7 +73,7 @@ export class AppComponent implements OnInit{
   users: User[] = []; // Stores the data to display, after applying filters
   currentPage: number = 0;
   searchTerm: string = '';
-  rowsPerPage: number = 10000;
+  rowsPerPage: number = 1000;
   totalDistance: number = 0; // Initialize totalDistance
   totalDist:number = 0;
   chart: any;
@@ -90,8 +90,10 @@ export class AppComponent implements OnInit{
   deviceIdCounts: DeviceIdCount[] = []; // New property for unique device IDs and counts
   detailsRequested: boolean = false; 
   totaltime:number = 0;
+  deviceIds:any[] = [];
+  showAllRows: boolean = false;
   private routeLayer: VectorLayer<VectorSource<Feature<Geometry>>> | null = null;
-
+  displayedUsers:User[] = []
   private apiUrl = 'http://learn2code.redgrape.tech:8081/x/unique-device-ids';
   // @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
   constructor(private http: HttpClient) {useGeographic(); }
@@ -186,13 +188,29 @@ private addRouteLayer(vectorSource: VectorSource<Feature<Geometry>>): void {
   });
   this.map.addLayer(this.routeLayer);
 }
-filterDevices() {
+filterDevices():void {
   const searchTermLower = this.searchTerm.toLowerCase();
   this.filteredDeviceIdCounts = this.deviceIdCounts.filter(device =>
     device.deviceId.toLowerCase().includes(searchTermLower)
   );
 }
-
+  // Method to handle the selection of a device ID from the suggestions
+  selectDevice(deviceId: string): void {
+    this.searchTerm = deviceId
+    this.filteredDeviceIdCounts = []
+    const selectedDevice = this.deviceIdCounts.find(device => device.deviceId === deviceId);
+      if (selectedDevice) {
+        this.clearPreviousData();
+        this.selectedDevice = selectedDevice;
+        this.deviceId = selectedDevice.deviceId;
+        this.startDate = this.formatDateTime(selectedDevice.start_date);
+        this.endDate = this.formatDateTime(selectedDevice.end_date);
+        this.detailsRequested = true;
+        if (deviceId && this.startDate && this.endDate) {
+          this.fetchTotalDistance(this.deviceId, this.startDate, this.endDate);
+        }
+      }
+  }
 loadPath(url: string): void {
   this.clearExistingRoute();
   this.http.get<{ content: any[] }>(url).subscribe({
@@ -350,6 +368,13 @@ onRowsPerPageChange(): void {
   // this.fetchDataWithFilters();
 }
 
+validateRowsPerPage(): void {
+  if (this.rowsPerPage > 2000) {
+    this.rowsPerPage = 2000;
+  } if (this.rowsPerPage <=0) {
+    this.rowsPerPage = 1;
+  }
+}
 
 
 
@@ -544,10 +569,17 @@ this.loadPath(url);
         });
 
         this.users = [...this.originalUsers];
+        // this.displayedUsers = this.users;
         this.renderChart(this.originalUsers);
         this.totalPages = response.totalPages;
         this.totalRows = response.totalElements;
         this.message = '';
+        this.displayedUsers = this.users.slice(0, 10);
+        // console.log(this.users.length)
+        if(this.users.length>0){
+          window.scrollTo(0, 0);
+      }
+      // this.showLess();
       } else {
         console.error('Unexpected response structure:', response);
         this.message = 'Failed to load data due to unexpected response structure.';
@@ -570,7 +602,7 @@ this.loadPath(url);
     
     this.http.get<{totalDistance: number,totalDurationInHours:number}>(url).subscribe(
       response => {
-        console.log(response);
+        // console.log(response);
         
         this.totalDistance = response.totalDistance;
         this.totaltime = response.totalDurationInHours;
@@ -603,10 +635,10 @@ this.loadPath(url);
   }
   fetchDataWithFilters(): void {
     // Call fetchData to get the paginated data
-    
+ 
     
     this.fetchData(this.currentPage, this.rowsPerPage, this.deviceId, this.startDate, this.endDate);
-    
+ 
     // Additionally, fetch the total distance for all data matching the filters
     // this.fetchTotalDistance(this.deviceId, this.startDate, this.endDate);
     
@@ -641,9 +673,9 @@ this.loadPath(url);
   fetchDeviceIdCounts(): void {
     this.http.get<any[]>(this.apiUrl).subscribe(
       response => {
-        // console.log(response);
-        const deviceIds = response.map(item => item[0]);
-
+        
+         this.deviceIds = response.map(item => item[0]);
+        // console.log(this.deviceIds);
         // If you want to store these device IDs in your component or service
         // this.handleDeviceIds(deviceIds);
         this.deviceIdCounts = response.map(item => ({
@@ -667,6 +699,15 @@ this.loadPath(url);
     );
   }
 
+  showMore(): void {
+    this.showAllRows = true;
+    this.displayedUsers = this.users;
+  }
+
+  showLess(): void {
+    this.showAllRows = false;
+    this.displayedUsers = this.users.slice(0, 10);
+  }
   // onDeviceSelect(deviceId: string) {
   //   const selectedDevice = this.deviceIdCounts.find(device => device.deviceId === deviceId);
   //   this.selectedDevice = selectedDevice;

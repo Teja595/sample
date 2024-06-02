@@ -1,5 +1,13 @@
 <div class="container">
   <div id="map" class="map">
+    <div class="legend-container">
+      <h4>Legend</h4>
+      <ul>
+        <li><span class="legend-icon" style="background-color: red;"></span> End Point</li>
+        <!-- <li><span class="legend-icon" style="background-color: yellow;"></span> Medium Speed</li> -->
+        <li><span class="legend-icon" style="background-color: green;"></span> Start Point</li>
+      </ul>
+    </div>
     <div *ngIf="selectedData" class="census-data-overlay">
       <h3>Feature Details:</h3>
       <p><strong>Device ID:</strong> {{ selectedData.deviceId }}</p>
@@ -8,16 +16,16 @@
       <p><strong>Speed:</strong> {{ selectedData.speed }}</p>
       <p><strong>Date:</strong> {{ selectedData.humanReadableDate }}</p>
 
-      <div *ngIf="selectedData.geoNames && selectedData.geoNames.geonames.length">
-        <h4>GeoNames:</h4>
+      <div *ngIf="selectedData.geoNames">
+        <!-- <h4>GeoNames:</h4> -->
         <div *ngFor="let geoName of selectedData.geoNames.geonames">
           <p><strong>Name:</strong> {{ geoName.name }}</p>
-          <p><strong>Country:</strong> {{ geoName.countryName }}</p>
-          <p><strong>Latitude:</strong> {{ geoName.lat }}</p>
-          <p><strong>Longitude:</strong> {{ geoName.lng }}</p>
-          <p><strong>Admin Name:</strong> {{ geoName.adminName1 }}</p>
-          <p><strong>Distance:</strong> {{ geoName.distance }} km</p>
-          <hr />
+          <!-- <p><strong>Country:</strong> {{ geoName.countryName }}</p> -->
+          <!-- <p><strong>Latitude:</strong> {{ geoName.lat }}</p>
+          <p><strong>Longitude:</strong> {{ geoName.lng }}</p> -->
+          <!-- <p><strong>Admin Name:</strong> {{ geoName.adminName1 }}</p> -->
+          <!-- <p><strong>Distance:</strong> {{ geoName.distance }} km</p> -->
+          <!-- <hr /> -->
         </div>
       </div>
 
@@ -37,13 +45,17 @@
       <label for="device-search">Search Device ID:</label>
       <input id="device-search" type="text" [(ngModel)]="searchTerm" placeholder="Type to search..." (input)="filterDevices()">
 
-
-      <label for="device-select">Select Device ID:</label>
-      <select id="device-select" (change)="onDeviceSelect($event)">
-        <option *ngFor="let device of filteredDeviceIdCounts" [value]="device.deviceId">
+      <ul *ngIf="filteredDeviceIdCounts.length > 0" class="suggestions">
+        <option *ngFor="let device of filteredDeviceIdCounts" (click)="selectDevice(device.deviceId)">
           {{ device.deviceId }}
         </option>
-      </select>
+      </ul>
+
+     <!-- <label for="device-select">Select Device ID:</label>
+<select id="device-select" (change)="onDeviceSelect($event)">
+  <option *ngFor="let deviceId of deviceIds" [value]="deviceId">{{ deviceId }}</option>
+</select> -->
+
     </div>
   </div>
 
@@ -64,13 +76,21 @@
       <input type="datetime-local" [(ngModel)]="endDate" placeholder="End Date" />
       <div>
         <label for="rows-per-page">Rows per page:</label>
-        <input id="rows-per-page" type="number" [(ngModel)]="rowsPerPage" (change)="onRowsPerPageChange()" min="1" max="2000">
+        <input 
+          id="rows-per-page" 
+          type="number" 
+          [(ngModel)]="rowsPerPage" 
+          (change)="onRowsPerPageChange()" 
+          min="1" 
+          max="2000"
+          (input)="validateRowsPerPage()">
       </div>
+      
       <button class="small-button" (click)="fetchDataWithFilters()">Fetch Data</button>
       <button class="small-button" (click)="downloadReport(deviceId, startDate, endDate)">Download Report</button>
       <div class="total-distance-box">
         <div>Distance: {{ totalDist | number:'1.2-2' }} km</div>
-        <!-- <div>Time: {{ totaltime | number:'1.2-2' }} hrs</div> -->
+        <div>Rows Found: {{ users.length}} </div>
       </div>
     </div>
 
@@ -95,7 +115,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of users">
+            <tr *ngFor="let user of displayedUsers">
               <td>{{ user.id }}</td>
               <td>{{ user.deviceId }}</td>
               <td>{{ user.epochData }}</td>
@@ -113,8 +133,12 @@
         </table>
       </div>
       <div class="button-container">
-        <button (click)="onPrevClick()" [disabled]="currentPage <= 0">Previous</button>
-        <button (click)="onNextClick()" [disabled]="currentPage >= totalPages - 1">Next</button>
+        <button *ngIf="!showAllRows" class="small-button show-more" (click)="showMore()">Show More</button>
+        <button *ngIf="showAllRows" class="small-button show-less" (click)="showLess()">Show Less</button>
+      </div>
+      <div class="pagination-container">
+        <button (click)="onPrevClick()" [disabled]="currentPage <= 0" class="prev-button">Previous</button>
+        <button (click)="onNextClick()" [disabled]="currentPage >= totalPages - 1" class="next-button">Next</button>
       </div>
       <div class="page-info">
         Page {{ currentPage + 1 }} of {{ totalPages }}
@@ -122,6 +146,11 @@
     </div>
 
     <ng-template #noRecords>
+      <div>
+        <p>
+
+        </p>
+      </div>
       <div class="no-records-message">
         No records present.
       </div>
@@ -131,4 +160,4 @@
 
   </div>
   
-</div>
+<!-- </div> -->
