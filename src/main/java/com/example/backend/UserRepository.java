@@ -15,10 +15,10 @@ public interface UserRepository extends JpaRepository<User_s, Long> {
 Page<User_s> findByDeviceId(String deviceId, Pageable pageable);
  Page<User_s> findByDeviceIdAndEpochDataBetween(String deviceId, Long startEpoch, Long endEpoch, Pageable pageable);
  @Query(value = "SELECT d.device_id, COUNT(d), SUM(d.speed), SUM(d.delta_t), SUM(d.delta_distance), SUM(d.mov_avg_spd), " +
- "TO_CHAR(TO_TIMESTAMP(MIN(d.epoch_data) / 1000), 'YYYY-MM-DD HH24:MI:SS') AS start_date, " +
- "TO_CHAR(TO_TIMESTAMP(MAX(d.epoch_data) / 1000), 'YYYY-MM-DD HH24:MI:SS') AS end_date, " +
- "FLOOR(EXTRACT(EPOCH FROM age(TO_TIMESTAMP(MAX(d.epoch_data) / 1000), TO_TIMESTAMP(MIN(d.epoch_data) / 1000)))/3600) || ' hours ' || " +
- "ROUND((EXTRACT(EPOCH FROM age(TO_TIMESTAMP(MAX(d.epoch_data) / 1000), TO_TIMESTAMP(MIN(d.epoch_data) / 1000))) % 3600) / 60) || ' minutes' AS time_difference " +
+ "MIN(d.human_readable_date) AS start_date, " +
+ "MAX(d.human_readable_date) AS end_date, " +
+ "FLOOR(EXTRACT(EPOCH FROM age(to_timestamp(MAX(d.human_readable_date), 'YYYY-MM-DD HH24:MI:SS'), to_timestamp(MIN(d.human_readable_date), 'YYYY-MM-DD HH24:MI:SS')))/3600) || ' hours ' || " +
+ "ROUND((EXTRACT(EPOCH FROM age(to_timestamp(MAX(d.human_readable_date), 'YYYY-MM-DD HH24:MI:SS'), to_timestamp(MIN(d.human_readable_date), 'YYYY-MM-DD HH24:MI:SS'))) % 3600) / 60) || ' minutes' AS time_difference " +
  "FROM ts d GROUP BY d.device_id", nativeQuery = true)
  List<Object[]> getDeviceIdCountsSumsAndMinMaxHumanReadableDatesAndDiff();
  

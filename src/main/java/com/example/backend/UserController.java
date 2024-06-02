@@ -56,7 +56,7 @@ import org.springframework.data.domain.Pageable;
         double[] durationAndDistance = userService.calculateTotalDurationAndDistance(deviceId, startEpoch, endEpoch);
         double totalDurationInHours = durationAndDistance[0];
         double totalDistance = durationAndDistance[1];
-            System.out.println(totalDurationInHours);
+            // System.out.println(totalDurationInHours);
             return ResponseEntity.ok(Map.of(
                 "totalDurationInHours", totalDurationInHours,
                 "totalDistance", totalDistance

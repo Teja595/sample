@@ -254,7 +254,7 @@ private void calculateFieldss(List<User_s> users) {
             current.setDelta_t(0.0);
             current.setMov_avg_spd(0.0);
             current.updateHumanReadableDate();
-
+            // usersWithValidAverageSpeeds.add(current);
             // Initialize the sliding window for the new day
             speedWindow.clear();
             speedWindow.add(0.0); // Starting with a speed of 0.0 km/h
@@ -294,7 +294,7 @@ private void calculateFieldss(List<User_s> users) {
       Double[] durationAndDistance = entry.getValue();
       Double totalDurationInHours = durationAndDistance[0];
       Double totalDistance = durationAndDistance[1];
-      System.out.println("Device ID: " + deviceId + ", Total Duration: " + totalDurationInHours + " hours, Total Distance: " + totalDistance + " km");
+    //   System.out.println("Device ID: " + deviceId + ", Total Duration: " + totalDurationInHours + " hours, Total Distance: " + totalDistance + " km");
   }
     
     users.clear();
